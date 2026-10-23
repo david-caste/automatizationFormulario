@@ -137,6 +137,13 @@ class FormularioGuias:
             valores = tuple(registro[campo] for campo in self.tabla_historial["columns"])
             self.tabla_historial.insert("", "end", iid=str(identificador), values=valores)
 
+    def mostrar_registro_guardado(self, identificador):
+        self.mostrar_historial()
+        fila = str(identificador)
+        self.tabla_historial.selection_set(fila)
+        self.tabla_historial.focus(fila)
+        self.tabla_historial.see(fila)
+
     def editar_registro_seleccionado(self):
         if self.tabla_historial is None:
             return
@@ -277,12 +284,14 @@ class FormularioGuias:
         }
         
         if self.registro_en_edicion is None:
+            identificador_guardado = self.siguiente_identificador
             self.datos_registrados.append(registro)
-            self.identificadores_registros.append(self.siguiente_identificador)
+            self.identificadores_registros.append(identificador_guardado)
             self.siguiente_identificador += 1
             mensaje = f"Registro para {guia_actual} añadido correctamente."
         else:
-            indice = self.identificadores_registros.index(self.registro_en_edicion)
+            identificador_guardado = self.registro_en_edicion
+            indice = self.identificadores_registros.index(identificador_guardado)
             self.datos_registrados[indice] = registro
             mensaje = f"Registro para {guia_actual} actualizado correctamente."
             self.registro_en_edicion = None
@@ -291,6 +300,7 @@ class FormularioGuias:
 
         self.reconstruir_historial_sugerencias()
         self.actualizar_tabla_historial()
+        self.mostrar_registro_guardado(identificador_guardado)
         messagebox.showinfo("Éxito", mensaje)
         self.limpiar_campos()
 
